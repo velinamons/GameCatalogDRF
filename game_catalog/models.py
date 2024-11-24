@@ -41,11 +41,15 @@ class Game(models.Model):
 
 
 class CustomUser(AbstractUser):
-    favorite_games = models.ManyToManyField(Game, blank=True, related_name="favorited_by")
+    favorite_games = models.ManyToManyField(
+        Game, blank=True, related_name="favorited_by"
+    )
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
+    )
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()
     post_date = models.DateTimeField(auto_now_add=True)

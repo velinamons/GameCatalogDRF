@@ -17,7 +17,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data.get("email", ""),
             first_name=validated_data.get("first_name", ""),
-            last_name=validated_data.get("last_name", "")
+            last_name=validated_data.get("last_name", ""),
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -62,7 +62,16 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ["id", "name", "description", "release_year", "genre", "studio", "in_favorites", "comments"]
+        fields = [
+            "id",
+            "name",
+            "description",
+            "release_year",
+            "genre",
+            "studio",
+            "in_favorites",
+            "comments",
+        ]
 
     def get_in_favorites(self, obj):
         return obj.favorited_by.count()
@@ -79,7 +88,15 @@ class UserAdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "first_name", "last_name", "email", "is_staff", "favorite_games"]
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "favorite_games",
+        ]
 
 
 class UserPublicSerializer(serializers.ModelSerializer):
@@ -88,4 +105,3 @@ class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["username", "favorite_games"]
-

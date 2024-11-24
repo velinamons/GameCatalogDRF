@@ -4,12 +4,23 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .custom_permissions import IsAdminOrReadOnly, IsOwnerOrAdmin, IsAuthenticatedOrReadOnly
+from .custom_permissions import (
+    IsAdminOrReadOnly,
+    IsOwnerOrAdmin,
+    IsAuthenticatedOrReadOnly,
+)
 
 from .models import Genre, Studio, Game, Comment, CustomUser
 from .serializers import (
-    GenreSerializer, StudioSerializer, GameSerializer, GameWriteSerializer,
-    CommentSerializer, UserAdminSerializer, UserPublicSerializer, RegisterSerializer, GameCommentSerializer
+    GenreSerializer,
+    StudioSerializer,
+    GameSerializer,
+    GameWriteSerializer,
+    CommentSerializer,
+    UserAdminSerializer,
+    UserPublicSerializer,
+    RegisterSerializer,
+    GameCommentSerializer,
 )
 
 
@@ -49,7 +60,11 @@ class GameViewSet(viewsets.ModelViewSet):
             return GameWriteSerializer
         return GameSerializer
 
-    @action(detail=True, methods=["get", "post"], permission_classes=[IsAuthenticatedOrReadOnly])
+    @action(
+        detail=True,
+        methods=["get", "post"],
+        permission_classes=[IsAuthenticatedOrReadOnly],
+    )
     def comments(self, request, pk=None):
         game = self.get_object()
         if request.method == "POST":
@@ -68,20 +83,30 @@ class GameViewSet(viewsets.ModelViewSet):
         game = self.get_object()
         user = request.user
         if game in user.favorite_games.all():
-            return Response({"detail": "Game is already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Game is already in favorites."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         user.favorite_games.add(game)
-        return Response({"detail": "Game added to favorites."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Game added to favorites."}, status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def remove_from_favorites(self, request, pk=None):
         game = self.get_object()
         user = request.user
         if game not in user.favorite_games.all():
-            return Response({"detail": "Game is not in favorites."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Game is not in favorites."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         user.favorite_games.remove(game)
-        return Response({"detail": "Game removed from favorites."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Game removed from favorites."}, status=status.HTTP_200_OK
+        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
