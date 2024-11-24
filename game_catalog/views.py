@@ -17,8 +17,8 @@ from .serializers import (
     GameSerializer,
     GameWriteSerializer,
     CommentSerializer,
-    UserAdminSerializer,
-    UserPublicSerializer,
+    UserExtendedInfoSerializer,
+    UserShortInfoSerializer,
     RegisterSerializer,
     GameCommentSerializer,
 )
@@ -128,10 +128,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return UserAdminSerializer
-        return UserPublicSerializer
+            return UserExtendedInfoSerializer
+        return UserShortInfoSerializer
 
     @action(detail=False, methods=["get"])
     def me(self, request):
-        serializer = UserAdminSerializer(request.user)
+        serializer = UserExtendedInfoSerializer(request.user)
         return Response(serializer.data)

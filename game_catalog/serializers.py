@@ -83,7 +83,7 @@ class GameWriteSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserAdminSerializer(serializers.ModelSerializer):
+class UserExtendedInfoSerializer(serializers.ModelSerializer):
     favorite_games = GameSerializer(many=True, read_only=True)
 
     class Meta:
@@ -99,7 +99,7 @@ class UserAdminSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserPublicSerializer(serializers.ModelSerializer):
+class UserShortInfoSerializer(serializers.ModelSerializer):
     favorite_games = GameSerializer(many=True, read_only=True)
 
     class Meta:
