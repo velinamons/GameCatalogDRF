@@ -47,7 +47,7 @@ class StudioViewSet(viewsets.ModelViewSet):
 
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.all(). Game.objects.select_related("studio").prefetch_related("genre")
+    queryset = Game.objects.select_related("studio").prefetch_related("genre")
     permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
