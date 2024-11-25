@@ -56,34 +56,19 @@ class GameViewSet(viewsets.ModelViewSet):
         return GameSerializer
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def add_to_favorites(self, request, pk=None):
+    def toggle_favorite(self, request, pk=None):
         game = self.get_object()
         user = request.user
+
         if game in user.favorite_games.all():
-            return Response(
-                {"detail": "Game is already in favorites."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            user.favorite_games.remove(game)
+            message = "Game removed from favorites."
+        else:
+            user.favorite_games.add(game)
+            message = "Game added to favorites."
 
-        user.favorite_games.add(game)
-        return Response(
-            {"detail": "Game added to favorites."}, status=status.HTTP_200_OK
-        )
-
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def remove_from_favorites(self, request, pk=None):
-        game = self.get_object()
-        user = request.user
-        if game not in user.favorite_games.all():
-            return Response(
-                {"detail": "Game is not in favorites."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user.favorite_games.remove(game)
-        return Response(
-            {"detail": "Game removed from favorites."}, status=status.HTTP_200_OK
-        )
+        serializer = UserShortInfoSerializer(user)
+        return Response({"message": message, "user": serializer.data}, status=status.HTTP_200_OK)
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
