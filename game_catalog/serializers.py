@@ -64,8 +64,6 @@ class GameWriteSerializer(serializers.ModelSerializer):
 
 
 class UserExtendedInfoSerializer(serializers.ModelSerializer):
-    favorite_games = GameSerializer(many=True, read_only=True)
-
     class Meta:
         model = CustomUser
         fields = [
