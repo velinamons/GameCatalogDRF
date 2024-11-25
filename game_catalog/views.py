@@ -1,9 +1,8 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .custom_permissions import (
     IsAdminOrReadOnly,
@@ -21,7 +20,6 @@ from .serializers import (
     UserExtendedInfoSerializer,
     UserShortInfoSerializer,
     RegisterSerializer,
-    GameCommentSerializer,
 )
 
 
@@ -49,32 +47,13 @@ class StudioViewSet(viewsets.ModelViewSet):
 
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.all()
+    queryset = Game.objects.all(). Game.objects.select_related("studio").prefetch_related("genre")
     permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
-            print("self.action in create, update")
             return GameWriteSerializer
         return GameSerializer
-
-    @action(
-        detail=True,
-        methods=["get", "post"],
-        permission_classes=[IsAuthenticatedOrReadOnly],
-    )
-    def comments(self, request, pk=None):
-        game = self.get_object()
-        if request.method == "POST":
-            serializer = GameCommentSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(user=request.user, game=game)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        comments = game.comments.all()
-        serializer = GameCommentSerializer(comments, many=True)
-        return Response(serializer.data)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def add_to_favorites(self, request, pk=None):
@@ -107,13 +86,23 @@ class GameViewSet(viewsets.ModelViewSet):
         )
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CommentDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsOwnerOrAdmin()]
 
 
 class UserViewSet(viewsets.ModelViewSet):

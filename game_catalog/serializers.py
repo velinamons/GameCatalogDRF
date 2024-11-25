@@ -25,17 +25,8 @@ class StudioSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class GameCommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = ["id", "user", "text", "post_date"]
-        read_only_fields = ["user", "post_date"]
-
-
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
@@ -55,7 +46,7 @@ class GameSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
-            "release_year",
+            "release_date",
             "genre",
             "studio",
             "in_favorites",
