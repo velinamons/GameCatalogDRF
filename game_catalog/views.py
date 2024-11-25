@@ -91,7 +91,7 @@ class CommentDetailView(generics.RetrieveDestroyAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.prefetch_related("favorite_games")
 
     def get_permissions(self):
         if self.action in ["me", "list", "retrieve"]:
