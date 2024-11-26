@@ -37,6 +37,9 @@ class CustomUser(AbstractUser):
         Game, blank=True, related_name="favorited_by"
     )
 
+    def is_favorite(self, game):
+        return self.favorite_games.filter(pk=game.pk).exists()
+
 
 class Comment(models.Model):
     user = models.ForeignKey(

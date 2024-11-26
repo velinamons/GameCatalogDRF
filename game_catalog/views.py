@@ -4,10 +4,10 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 
+from . import actions
 from .custom_permissions import (
     IsAdminOrReadOnly,
     IsOwnerOrAdmin,
-    IsAuthenticatedOrReadOnly,
 )
 
 from .models import Genre, Studio, Game, Comment, CustomUser
@@ -60,15 +60,17 @@ class GameViewSet(viewsets.ModelViewSet):
         game = self.get_object()
         user = request.user
 
-        if game in user.favorite_games.all():
-            user.favorite_games.remove(game)
-            message = "Game removed from favorites."
-        else:
-            user.favorite_games.add(game)
-            message = "Game added to favorites."
+        actions.toggle_favorite(user, game)
 
-        serializer = UserShortInfoSerializer(user)
-        return Response({"message": message, "user": serializer.data}, status=status.HTTP_200_OK)
+        user_data = UserShortInfoSerializer(user).data
+
+        return Response(
+            {
+                "is_favorite": user.is_favorite(game),
+                "user": user_data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
