@@ -21,7 +21,7 @@ from .serializers import (
     ToggleFavoriteResponseSerializer,
     UserExtendedInfoSerializer,
     UserShortInfoSerializer,
-    RegisterSerializer,
+    RegisterSerializer, ToggleFavoriteResponseSerializer,
 )
 
 
