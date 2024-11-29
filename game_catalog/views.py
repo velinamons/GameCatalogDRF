@@ -1,7 +1,7 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import generics, status, viewsets 
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
@@ -11,16 +11,17 @@ from .custom_permissions import (
     IsOwnerOrAdmin,
 )
 
-from .models import Genre, Studio, Game, Comment, CustomUser
+from .models import Comment, CustomUser, Game, Genre, Studio
 from .serializers import (
+    CommentSerializer,
     GenreSerializer,
-    StudioSerializer,
     GameSerializer,
     GameWriteSerializer,
-    CommentSerializer,
+    StudioSerializer,
+    ToggleFavoriteResponseSerializer,
     UserExtendedInfoSerializer,
     UserShortInfoSerializer,
-    RegisterSerializer, ToggleFavoriteResponseSerializer,
+    RegisterSerializer,
 )
 
 
