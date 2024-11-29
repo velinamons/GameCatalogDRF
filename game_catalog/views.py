@@ -1,8 +1,9 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import generics, status, viewsets 
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
 from . import actions
 from .custom_permissions import (
@@ -10,13 +11,14 @@ from .custom_permissions import (
     IsOwnerOrAdmin,
 )
 
-from .models import Genre, Studio, Game, Comment, CustomUser
+from .models import Comment, CustomUser, Game, Genre, Studio
 from .serializers import (
+    CommentSerializer,
     GenreSerializer,
-    StudioSerializer,
     GameSerializer,
     GameWriteSerializer,
-    CommentSerializer,
+    StudioSerializer,
+    ToggleFavoriteResponseSerializer,
     UserExtendedInfoSerializer,
     UserShortInfoSerializer,
     RegisterSerializer,
@@ -46,6 +48,35 @@ class StudioViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="Retrieve a list of all games. Read-only for everyone.",
+        responses=GameSerializer,
+    ),
+    retrieve=extend_schema(
+        description="Retrieve details of a specific game. Read-only for everyone.",
+        responses=GameSerializer,
+    ),
+    create=extend_schema(
+        description="Create a new game entry. Admins only.",
+        request=GameWriteSerializer,
+        responses=GameSerializer,
+    ),
+    update=extend_schema(
+        description="Update an existing game entry. Admins only.",
+        request=GameWriteSerializer,
+        responses=GameSerializer,
+    ),
+    partial_update=extend_schema(
+        description="Partially update a game entry. Admins only.",
+        request=GameWriteSerializer,
+        responses=GameSerializer,
+    ),
+    destroy=extend_schema(
+        description="Delete a game entry. Admins only.",
+        responses=OpenApiResponse(description="No content"),
+    ),
+)
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.select_related("studio").prefetch_related("genre")
     permission_classes = [IsAdminOrReadOnly]
@@ -55,6 +86,13 @@ class GameViewSet(viewsets.ModelViewSet):
             return GameWriteSerializer
         return GameSerializer
 
+    @extend_schema(
+        description="Toggle a game in or out of the user's favorites list. Requires authentication.",
+        request=None,
+        responses={
+            200: ToggleFavoriteResponseSerializer,
+        }
+    )
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def toggle_favorite(self, request, pk=None):
         game = self.get_object()
@@ -62,15 +100,15 @@ class GameViewSet(viewsets.ModelViewSet):
 
         actions.toggle_favorite(user, game)
 
-        user_data = UserShortInfoSerializer(user).data
+        response_data = {
+            "is_favorite": user.is_favorite(game),
+            "user": UserShortInfoSerializer(user).data,
+        }
 
-        return Response(
-            {
-                "is_favorite": user.is_favorite(game),
-                "user": user_data,
-            },
-            status=status.HTTP_200_OK,
-        )
+        serializer = ToggleFavoriteResponseSerializer(data=response_data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
