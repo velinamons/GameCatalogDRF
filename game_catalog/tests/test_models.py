@@ -1,4 +1,5 @@
 import pytest
+
 from game_catalog.models import Comment
 
 pytestmark = pytest.mark.django_db
