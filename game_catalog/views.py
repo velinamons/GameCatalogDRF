@@ -1,27 +1,23 @@
-from rest_framework import generics, status, viewsets 
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
 from . import actions
-from .custom_permissions import (
-    IsAdminOrReadOnly,
-    IsOwnerOrAdmin,
-)
-
+from .custom_permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
 from .models import Comment, CustomUser, Game, Genre, Studio
 from .serializers import (
     CommentSerializer,
-    GenreSerializer,
     GameSerializer,
     GameWriteSerializer,
+    GenreSerializer,
+    RegisterSerializer,
     StudioSerializer,
     ToggleFavoriteResponseSerializer,
     UserExtendedInfoSerializer,
     UserShortInfoSerializer,
-    RegisterSerializer, ToggleFavoriteResponseSerializer,
 )
 
 
@@ -91,7 +87,7 @@ class GameViewSet(viewsets.ModelViewSet):
         request=None,
         responses={
             200: ToggleFavoriteResponseSerializer,
-        }
+        },
     )
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def toggle_favorite(self, request, pk=None):
@@ -100,14 +96,9 @@ class GameViewSet(viewsets.ModelViewSet):
 
         actions.toggle_favorite(user, game)
 
-        response_data = {
-            "is_favorite": user.is_favorite(game),
-            "user": UserShortInfoSerializer(user).data,
-        }
+        response_data = {"is_favorite": user.is_favorite(game), "user": user}
 
-        serializer = ToggleFavoriteResponseSerializer(data=response_data)
-        serializer.is_valid(raise_exception=True)
-
+        serializer = ToggleFavoriteResponseSerializer(response_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
