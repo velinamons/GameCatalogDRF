@@ -1,5 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import AccessToken
+
 from game_catalog.models import Game, Genre, Studio
 
 User = get_user_model()
@@ -16,6 +18,19 @@ def admin_user():
 
 
 @pytest.fixture
+def access_token(user):
+    """
+    Fixture to generate a JWT access token for a given user.
+    """
+    def _get_access_token(user_instance=None):
+        user_instance = user_instance or user
+        token = AccessToken.for_user(user_instance)
+        return str(token)
+
+    return _get_access_token
+
+
+@pytest.fixture
 def genre():
     return Genre.objects.create(name="Action", description="Action games")
 
@@ -23,7 +38,10 @@ def genre():
 @pytest.fixture
 def studio():
     return Studio.objects.create(
-        name="Epic Games", founded_date="1991-01-01", description="Game studio", country="USA"
+        name="Epic Games",
+        founded_date="1991-01-01",
+        description="Game studio",
+        country="USA",
     )
 
 
