@@ -19,7 +19,7 @@ def test_game_str(game):
 
 def test_user_is_favorite(user, game):
     user.favorite_games.add(game)
-    assert user.is_favorite(game) is True
+    assert user.favorited(game) is True
 
 
 def test_comment_creation(user, game):

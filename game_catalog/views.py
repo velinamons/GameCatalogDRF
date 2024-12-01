@@ -96,7 +96,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
         actions.toggle_favorite(user, game)
 
-        response_data = {"is_favorite": user.is_favorite(game), "user": user}
+        response_data = {"is_favorite": user.favorited(game), "user": user}
 
         serializer = ToggleFavoriteResponseSerializer(response_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
