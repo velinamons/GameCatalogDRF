@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework.test import APIClient
 import pytest
 
@@ -12,9 +13,9 @@ def api_client():
 @pytest.fixture
 def paths(game, genre):
     return {
-        "genre_list": "/api/genres/",
-        "game_detail": f"/api/games/{game.id}/",
-        "toggle_favorite": f"/api/games/{game.id}/toggle_favorite/",
+        "genre_list": reverse("genre-list"),
+        "game_detail": reverse("game-detail", kwargs={"pk": game.id}),
+        "toggle_favorite": reverse("game-toggle-favorite", kwargs={"pk": game.id}),
     }
 
 
