@@ -38,7 +38,6 @@ class CommentSerializer(serializers.ModelSerializer):
 class GameSerializer(serializers.ModelSerializer):
     studio = StudioSerializer(read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
-    comments = CommentSerializer(many=True, read_only=True, source="comments_set")
     in_favorites = serializers.SerializerMethodField()
 
     class Meta:
@@ -57,6 +56,7 @@ class GameSerializer(serializers.ModelSerializer):
             "comments",
         ]
 
+    @extend_schema_field(serializers.IntegerField)
     def get_in_favorites(self, obj):
         return obj.favorited_by.count()
 
