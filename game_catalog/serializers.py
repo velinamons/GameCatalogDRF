@@ -53,6 +53,10 @@ class GameSerializer(serializers.ModelSerializer):
         ]
 
     @extend_schema_field(serializers.IntegerField)
+            "comments",
+        ]
+
+    @extend_schema_field(serializers.IntegerField)
     def get_in_favorites(self, obj):
         return obj.favorited_by.count()
 
