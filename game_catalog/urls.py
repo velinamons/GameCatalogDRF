@@ -10,7 +10,6 @@ from .views import (
     UserViewSet,
 )
 
-
 router = DefaultRouter()
 router.register("genres", GenreViewSet)
 router.register("studios", StudioViewSet)
