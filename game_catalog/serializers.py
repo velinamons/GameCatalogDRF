@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from .models import Genre, Studio, Game, Comment, CustomUser
 
@@ -50,6 +51,9 @@ class GameSerializer(serializers.ModelSerializer):
             "genre",
             "studio",
             "in_favorites",
+        ]
+
+    @extend_schema_field(serializers.IntegerField)
             "comments",
         ]
 
@@ -81,3 +85,8 @@ class UserShortInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["username", "favorite_games"]
+
+
+class ToggleFavoriteResponseSerializer(serializers.Serializer):
+    is_favorite = serializers.BooleanField()
+    user = UserShortInfoSerializer()

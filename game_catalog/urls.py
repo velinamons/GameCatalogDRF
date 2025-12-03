@@ -1,6 +1,15 @@
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.urls import path, include
-from .views import GenreViewSet, StudioViewSet, GameViewSet, UserViewSet, CommentListCreateView, CommentDetailView
+
+from .views import (
+    CommentDetailView,
+    CommentListCreateView,
+    GameViewSet,
+    GenreViewSet,
+    StudioViewSet,
+    UserViewSet,
+)
+
 
 router = DefaultRouter()
 router.register("genres", GenreViewSet)
